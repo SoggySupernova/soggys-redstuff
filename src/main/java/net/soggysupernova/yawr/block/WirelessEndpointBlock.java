@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.soggysupernova.yawr.YetAnotherWirelessRedstone;
 import net.soggysupernova.yawr.block.entity.custom.WirelessEndpointBlockEntity;
 import net.soggysupernova.yawr.item.ModItems;
 import net.soggysupernova.yawr.util.BlockPosAndDimension;
@@ -56,17 +57,21 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
             return super.useWithoutItem(state, level, pos, player, hitResult);
         }
 
+
+        if (itemStack.isEmpty()) {
+            if (player.isCrouching()) {
+                counterBlockEntity.clearReceivers();
+                level.playSound(player, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS, 1.0F, 0.8F);
+                return InteractionResult.SUCCESS; // swing arm
+            }
+        }
+
+
         if (!itemStack.is(ModItems.WIRELESS_LINKER)) {
             return super.useWithoutItem(state, level, pos, player, hitResult);
         }
 
-        if (itemStack.is(Items.AIR)) {
-            if (player.isCrouching()) {
-                counterBlockEntity.clearReceivers();
-                level.playSound(player, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS, 1.0F, 0.8F);
-                return super.useWithoutItem(state, level, pos, player, hitResult);
-            }
-        }
+
 
         level.playSound(player, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS, 1.0F, 1.0F);
 
