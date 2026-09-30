@@ -11,11 +11,16 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.soggysupernova.yawr.block.entity.custom.WirelessEndpointBlockEntity;
 import net.soggysupernova.yawr.item.ModItems;
@@ -24,12 +29,25 @@ import org.jspecify.annotations.Nullable;
 
 public class WirelessEndpointBlock extends BaseEntityBlock {
     protected WirelessEndpointBlock(Properties properties) {
+
         super(properties);
+
+        registerDefaultState(defaultBlockState().setValue(POWER, 0));
     }
+
+
+
+    public static final IntegerProperty POWER = BlockStateProperties.POWER;
+
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos worldPosition, BlockState blockState) {
         return new WirelessEndpointBlockEntity(worldPosition, blockState);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(POWER);
     }
 
     @Override
@@ -40,6 +58,14 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
 
         if (!itemStack.is(ModItems.WIRELESS_LINKER)) {
             return super.useWithoutItem(state, level, pos, player, hitResult);
+        }
+
+        if (itemStack.is(Items.AIR)) {
+            if (player.isCrouching()) {
+                counterBlockEntity.clearReceivers();
+                level.playSound(player, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS, 1.0F, 0.8F);
+                return super.useWithoutItem(state, level, pos, player, hitResult);
+            }
         }
 
         level.playSound(player, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS, 1.0F, 1.0F);
