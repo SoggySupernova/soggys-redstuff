@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "yet-another-wireless-redstone:wireless_endpoint"
+        }
+      ],
+      "rolls": 1
+    }
+  ]
+}

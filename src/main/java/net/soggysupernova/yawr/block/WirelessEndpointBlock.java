@@ -1,0 +1,69 @@
+package net.soggysupernova.yawr.block;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.soggysupernova.yawr.block.entity.custom.WirelessEndpointBlockEntity;
+import net.soggysupernova.yawr.item.ModItems;
+import net.soggysupernova.yawr.util.BlockPosAndDimension;
+import org.jspecify.annotations.Nullable;
+
+public class WirelessEndpointBlock extends BaseEntityBlock {
+    protected WirelessEndpointBlock(Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public @Nullable BlockEntity newBlockEntity(BlockPos worldPosition, BlockState blockState) {
+        return new WirelessEndpointBlockEntity(worldPosition, blockState);
+    }
+
+    @Override
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!(level.getBlockEntity(pos) instanceof WirelessEndpointBlockEntity counterBlockEntity)) {
+            return super.useWithoutItem(state, level, pos, player, hitResult);
+        }
+
+        if (!itemStack.is(ModItems.WIRELESS_LINKER)) {
+            return super.useWithoutItem(state, level, pos, player, hitResult);
+        }
+
+        level.playSound(player, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS, 1.0F, 1.0F);
+
+        counterBlockEntity.incrementClicks();
+
+        if (level.isClientSide()) {
+            player.sendOverlayMessage(Component.literal("Set transmitter coordinates to " + pos.toShortString() + ""));
+
+        }
+        var newstack = itemStack.split(1);
+        newstack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
+        CompoundTag compound = new CompoundTag();
+        compound.putInt("x", pos.getX());
+        compound.putInt("y", pos.getY());
+        compound.putInt("z", pos.getZ());
+        compound.putString("dim", level.dimension().identifier().toString());
+        newstack.set(DataComponents.CUSTOM_DATA, CustomData.of(compound));
+        player.getInventory().placeItemBackInInventory(newstack, false, null);
+
+        counterBlockEntity.addReceiver(new BlockPosAndDimension(pos.getX(), pos.getY(), pos.getZ(), level.dimension().identifier().toString()));
+
+        return InteractionResult.SUCCESS;
+    }
+
+
+}

@@ -1,0 +1,6 @@
+// 26.3	-999999999-01-01T00:00:00	Yet Another Wireless Redstone/Model Definitions
+1c99037ec97fd5321ffe8bafcf736ab3daf03dd6 assets/yet-another-wireless-redstone/blockstates/wireless_endpoint.json
+83e9f15c0f3d49db3f1cc6aea257352740bd5e4a assets/yet-another-wireless-redstone/items/wireless_endpoint.json
+7c06c212dd0b507ff980ed89ec00b165114b264f assets/yet-another-wireless-redstone/items/wireless_linker.json
+655d7fffbe94d6e2545617ac4b0a8f3ce9571b11 assets/yet-another-wireless-redstone/models/block/wireless_endpoint.json
+4a7db3dd523ab654b1887804c6921cb731df212f assets/yet-another-wireless-redstone/models/item/wireless_linker.json

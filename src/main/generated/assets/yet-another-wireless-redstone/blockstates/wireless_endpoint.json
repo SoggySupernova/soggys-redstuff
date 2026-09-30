@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint"
+    }
+  }
+}
