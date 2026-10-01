@@ -91,6 +91,29 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
             player.sendOverlayMessage(Component.literal("Set transmitter coordinates to " + pos.toShortString() + ""));
 
         }
+
+
+        CustomData a = itemStack.get(DataComponents.CUSTOM_DATA);
+
+        if (a instanceof CustomData && a.copyTag().contains("dim")) {
+            var b = a.copyTag();
+            boolean isSameBlock = b.get("x").toString().equals(String.valueOf(pos.getX())) && b.get("y").toString().equals(String.valueOf(pos.getY())) && b.get("z").toString().equals(String.valueOf(pos.getZ())) && b.get("dim").toString().equals("\""+level.dimension().identifier().toString()+"\"");
+            YetAnotherWirelessRedstone.LOGGER.info(String.valueOf(b.get("dim").toString()));
+            YetAnotherWirelessRedstone.LOGGER.info((level.dimension().identifier().toString()));
+            if (isSameBlock && level.isClientSide()) {
+                player.sendOverlayMessage(Component.literal("Can't link an endpoint to itself!"));
+            }
+
+            if (!isSameBlock) {
+                counterBlockEntity.setIsReceiver(true);
+                if (level.isClientSide()) {
+                    player.sendOverlayMessage(Component.literal("Successfully linked endpoints!"));
+                }
+            }
+        }
+
+
+
         var newstack = itemStack.split(1);
         newstack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
         CompoundTag compound = new CompoundTag();
@@ -101,7 +124,10 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
         newstack.set(DataComponents.CUSTOM_DATA, CustomData.of(compound));
         player.getInventory().placeItemBackInInventory(newstack, false, null);
 
-        counterBlockEntity.addReceiver(new BlockPosAndDimension(pos.getX(), pos.getY(), pos.getZ(), level.dimension().identifier().toString()));
+
+
+
+        //counterBlockEntity.addReceiver(new BlockPosAndDimension(pos.getX(), pos.getY(), pos.getZ(), level.dimension().identifier().toString()));
 
         return InteractionResult.SUCCESS;
     }

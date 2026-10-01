@@ -27,6 +27,11 @@ import java.util.Vector;
 public class WirelessEndpointBlockEntity extends BlockEntity {
     private int clicks = 0;
 
+
+
+
+
+
     private Vector<BlockPosAndDimension> receivers = new Vector<>();
 
     public int getClicks() {
@@ -34,8 +39,8 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
     }
 
     public Vector<BlockPosAndDimension> getReceivers() {
-        return receivers;
-    }
+        return this.receivers;
+    } // what the difference between this.receivers and receivers
 
     public void setReceivers(Vector<BlockPosAndDimension> receivers) {
         this.receivers = receivers;
@@ -45,6 +50,16 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
         this.receivers = new Vector<>();
     }
 
+
+    private boolean isReceiver = false;
+
+    public boolean isReceiver() {
+        return isReceiver;
+    }
+
+    public void setIsReceiver(boolean receiver) {
+        isReceiver = receiver;
+    }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WirelessEndpointBlockEntity blockEntity) {
         if (level instanceof ServerLevel l) {
@@ -83,6 +98,7 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
             output.putString("receiver"+i, getReceivers().get(i).serialize());
         }
         output.putInt("receiverCount",getReceivers().size());
+        output.putBoolean("isReceiver",isReceiver());
         super.saveAdditional(output);
     }
 
@@ -97,6 +113,7 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
             receivers.add(BlockPosAndDimension.deserialize(string));
         }
         this.receivers = receivers;
+        this.isReceiver = input.getBooleanOr("isReceiver",false);
     }
 
     @Override
