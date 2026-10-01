@@ -17,12 +17,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.soggysupernova.yawr.YetAnotherWirelessRedstone;
+import net.soggysupernova.yawr.block.entity.ModBlockEntities;
 import net.soggysupernova.yawr.block.entity.custom.WirelessEndpointBlockEntity;
 import net.soggysupernova.yawr.item.ModItems;
 import net.soggysupernova.yawr.util.BlockPosAndDimension;
@@ -39,6 +42,13 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
 
 
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
+
+
+    @Override
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
+        return BaseEntityBlock.<WirelessEndpointBlockEntity, T>createTickerHelper(type, ModBlockEntities.WIRELESS_ENDPOINT_BLOCK_ENTITY, WirelessEndpointBlockEntity::tick);
+    }
+
 
 
     @Override
