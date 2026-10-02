@@ -25,7 +25,7 @@ public class ModItems {
     }
 
 
-    public static final Item WIRELESS_LINKER = registerItem("wireless_linker", properties -> new Item(properties));
+    public static final Item WIRELESS_LINKER = registerItem("wireless_linker", WirelessLinkerItem::new);
     private static Item registerItem(String name, Function<Item.Properties, Item> function) {
         return Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(YetAnotherWirelessRedstone.MOD_ID, name), function.apply(new Item.Properties().setId(ResourceKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(YetAnotherWirelessRedstone.MOD_ID, name)))));
     }

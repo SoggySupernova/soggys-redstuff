@@ -15,9 +15,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.soggysupernova.yawr.YetAnotherWirelessRedstone;
+import net.soggysupernova.yawr.block.WirelessEndpointBlock;
 import net.soggysupernova.yawr.util.BlockPosAndDimension;
 import net.soggysupernova.yawr.block.entity.ModBlockEntities;
 import org.jspecify.annotations.Nullable;
@@ -59,13 +61,21 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
 
     public void setIsReceiver(boolean receiver) {
         isReceiver = receiver;
+        level.setBlock(this.worldPosition, this.getBlockState().setValue(WirelessEndpointBlock.IS_RECEIVER, receiver), WirelessEndpointBlock.UPDATE_NONE);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WirelessEndpointBlockEntity blockEntity) {
         if (level instanceof ServerLevel l) {
             l.setChunkForced(pos.getX() >> 4, pos.getZ() >> 4, true);
         }
+
     }
+
+
+    public int getReceiverCount() {
+        return receivers.size();
+    }
+
 
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
