@@ -202,6 +202,12 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
         return state.getValue(IS_RECEIVER);
     }
 
+
+    @Override
+    protected boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         if (level.getBlockEntity(pos) instanceof WirelessEndpointBlockEntity as) {

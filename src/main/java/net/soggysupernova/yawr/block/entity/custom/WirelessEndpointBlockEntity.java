@@ -46,10 +46,12 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
 
     public void setReceivers(Vector<BlockPosAndDimension> receivers) {
         this.receivers = receivers;
+        level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
     }
 
     public void clearReceivers() {
         this.receivers = new Vector<>();
+        level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
     }
 
 
@@ -61,7 +63,7 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
 
     public void setIsReceiver(boolean receiver) {
         isReceiver = receiver;
-        level.setBlock(this.worldPosition, this.getBlockState().setValue(WirelessEndpointBlock.IS_RECEIVER, receiver), WirelessEndpointBlock.UPDATE_NONE);
+        level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WirelessEndpointBlockEntity blockEntity) {
@@ -87,6 +89,8 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
 
     public void addReceiver(BlockPosAndDimension recv) {
         this.receivers.add(recv);
+        YetAnotherWirelessRedstone.LOGGER.info("NEOGHBOUR UPDAIN "+worldPosition);
+        level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
     }
 
     public void incrementClicks() {
