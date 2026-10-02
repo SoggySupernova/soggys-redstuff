@@ -63,7 +63,7 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
 
     public void setIsReceiver(boolean receiver) {
         isReceiver = receiver;
-        level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+        level.setBlock(this.worldPosition, this.getBlockState().setValue(WirelessEndpointBlock.IS_RECEIVER, receiver), WirelessEndpointBlock.UPDATE_ALL);
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, WirelessEndpointBlockEntity blockEntity) {
