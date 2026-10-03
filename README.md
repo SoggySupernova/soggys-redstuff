@@ -15,15 +15,18 @@ markdown is silly<br>
 
 
 "A new kind of wireless redstone"
+
 Wireless Endpoint
 "Transmitter set to 0,0,0" ✅
 
 Wireless Linker
+
 Position and dimension stored in item components ✅
 
 
 
 Shift right click with linker: clear transmitter AND receiver, send a message and sound to client ✅
+
 And reset receiver to uninitialized/transmktter✅
 
 Swap transmitter and receiver?
@@ -32,20 +35,21 @@ Swap transmitter and receiver?
 
 
 Test edge cases:
-Transmitter and receiver same block ✅
-Receiver is deleted (Transmitter should check block before sending)
-Item is linked to a transmitter which is then deleted before linked to a receiver
-
-Multiplayer sync
-Multiple transmitters to one receiver
-Shift-right-click transmitter or receiver with active linker or air in hand: Reset item and block ✅
-Test custom dimensions
-Block linked to a dimension that is later deleted
+- Transmitter and receiver same block ✅
+- Receiver is deleted (Transmitter should check block before sending)
+- Item is linked to a transmitter which is then deleted before linked to a receiver
+- Multiplayer sync
+- Multiple transmitters to one receiver
+- Shift-right-click transmitter or receiver with active linker or air in hand: Reset item and block ✅
+- Test custom dimensions
+- Block linked to a dimension that is later deleted
 
 Deduplicate receivers list (for comparator output)
 
 When clearing connections, clear isReceiver of connected receivers
+
 (In clearReceivers function so that this also fixes:
+
 Transmitter is deleted (connections are automatically deleted, but connected receivers should reset to uninitialized/transmitter and clear redone power and block state)
 
 
@@ -77,7 +81,6 @@ Redstone 90 degree turn repeater
 
 
 Fix wrapping dimension in "\""+"\""
-maybe toShortStribf?
 
 
 
