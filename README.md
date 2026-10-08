@@ -19,7 +19,7 @@ markdown is silly<br>
 Wireless Endpoint
 "Transmitter set to 0,0,0" ✅
 
-Wireless Linker
+Wireless Linker ✅
 
 Position and dimension stored in item components ✅
 
@@ -36,7 +36,7 @@ Swap transmitter and receiver?
 
 Test edge cases:
 - Transmitter and receiver same block ✅
-- Receiver is deleted (Transmitter should check block before sending (ANd check if it's a receiver!))
+- Receiver is deleted (Transmitter should check block before sending (ANd check if it's a receiver! (And, if I implement it, that its stored transmitter location matches us))
 - Receiver is reset and a different transmitter connects to it (It should clear its first receiver on reset)
 - Item is linked to a transmitter which is then deleted before linked to a receiver
 - Item linked to transmitter, transmitter deleted and replaced with a reciever before linked to a receiver (check that isReceiver is false i guess)
@@ -65,7 +65,9 @@ Only do the item split thing if more than one in stack
 
 Different block texture for transmitter/receiver
 
+Functionize code more
 
+Survival mechanics (crafting, mining, etc.)
 
 Floatater: Pusher
 
