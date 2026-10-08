@@ -60,7 +60,7 @@ public class BlockPosAndDimension {
     }
 
     public BlockPosAndDimension fromBlockPosAndDimension(BlockPos pos, ResourceKey<Level> level) {
-        return null; // todo
+        return new BlockPosAndDimension(pos.getX(), pos.getY(), pos.getZ(), level.identifier().toString()); // todo: test this
     }
 
 
