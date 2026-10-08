@@ -60,7 +60,7 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
 
     @Override
     public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
-        return BaseEntityBlock.<WirelessEndpointBlockEntity, T>createTickerHelper(type, ModBlockEntities.WIRELESS_ENDPOINT_BLOCK_ENTITY, WirelessEndpointBlockEntity::tick);
+        return BaseEntityBlock.createTickerHelper(type, ModBlockEntities.WIRELESS_ENDPOINT_BLOCK_ENTITY, WirelessEndpointBlockEntity::tick);
     }
 
 

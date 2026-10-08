@@ -26,6 +26,7 @@ import net.soggysupernova.yawr.util.BlockPosAndDimension;
 import net.soggysupernova.yawr.block.entity.ModBlockEntities;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.Vector;
 
 public class WirelessEndpointBlockEntity extends BlockEntity {
@@ -37,6 +38,8 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
 
 
     private Vector<BlockPosAndDimension> receivers = new Vector<>();
+
+    private BlockPosAndDimension transmitter = null;
 
     public int getClicks() {
         return this.clicks;
@@ -52,16 +55,22 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
     }
 
     public void clearReceivers() {
-        for (int i = 0; i < this.getReceiverCount(); i++) {
-            YetAnotherWirelessRedstone.LOGGER.info("Transmitter block cleared (shift click with torch or block break)! Looping through and resetting receivers...");
-            var receiverLevel = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(receivers.get(i).getDimension())));
-            var receiverBlockPos = new BlockPos(receivers.get(i).getX(), receivers.get(i).getY(), receivers.get(i).getZ());
-            var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(WirelessEndpointBlock.IS_RECEIVER, false).setValue(WirelessEndpointBlock.POWER,0);
-            receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
-            // todo: clear their stored transmitter locations
-        }
-        this.receivers = new Vector<>();
-        level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+        if (!level.isClientSide()) {
+            for (int i = 0; i < this.getReceiverCount(); i++) {
+                YetAnotherWirelessRedstone.LOGGER.info("Transmitter block cleared (shift click with torch or block break)! Looping through and resetting receivers...");
+                var receiverLevel = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(receivers.get(i).getDimension())));
+                var receiverBlockPos = new BlockPos(receivers.get(i).getX(), receivers.get(i).getY(), receivers.get(i).getZ());
+                var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(WirelessEndpointBlock.IS_RECEIVER, false).setValue(WirelessEndpointBlock.POWER, 0);
+                receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
+                // todo: clear their stored transmitter locations
+            }
+            this.receivers = new Vector<>();
+            level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+        } // Serverside check fixes a weird thing where creating a link from a receiver back to its transmitter would cause a crash when trying to reset the original transmitter
+        // how to recreate it:
+        // comment out if statement, place three endpoints, get an uninitialized linker
+        // right click first one, right click second one, shift-right-click third one
+        // right click second one, right click first one, shift-right-click first one
     }
 
     public void removeReceiver(BlockPosAndDimension recv) {
@@ -109,6 +118,7 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
             l.setChunkForced(pos.getX() >> 4, pos.getZ() >> 4, false);
         }
         this.clearReceivers(); // reset receivers states
+        setIsReceiver(false); // Remove my location from my transmitter's list
         super.preRemoveSideEffects(pos, state);
     }
 
@@ -137,6 +147,12 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
         }
         output.putInt("receiverCount",getReceivers().size());
         output.putBoolean("isReceiver",isReceiver());
+        if (getTransmitter() != null) {
+            output.putString("transmitter", getTransmitter().serialize());
+        } else {
+            output.putString("transmitter", "");
+        }
+
         super.saveAdditional(output);
     }
 
@@ -152,6 +168,12 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
         }
         this.receivers = receivers;
         this.isReceiver = input.getBooleanOr("isReceiver",false);
+        var thething = input.getStringOr("transmitter", "");
+        if (thething.equals("")) {
+            this.transmitter = null;
+        } else {
+            this.transmitter = BlockPosAndDimension.deserialize(thething);
+        }
     }
 
     @Override
@@ -173,5 +195,14 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
         BlockState state = getBlockState();
 
         level.sendBlockUpdated(worldPosition, state, state, Block.UPDATE_ALL);
+    }
+
+
+    public BlockPosAndDimension getTransmitter() {
+        return transmitter;
+    }
+
+    public void setTransmitter(BlockPosAndDimension transmitter) {
+        this.transmitter = transmitter;
     }
 }

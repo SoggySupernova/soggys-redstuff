@@ -41,6 +41,7 @@ Test edge cases:
 - Item is linked to a transmitter which is then deleted before linked to a receiver
 - Item linked to transmitter, transmitter deleted and replaced with a reciever before linked to a receiver (check that isReceiver is false i guess)
 - Multiplayer sync
+- Trying to start a link with a receiver
 - Multiple transmitters to one receiver
 - Shift-right-click transmitter or receiver with active linker or air in hand: Reset item and block ✅
 - Test custom dimensions
@@ -60,6 +61,7 @@ Maybe store transmitter location to
 2. Prevent multiple transmitters to one receiver
 
 Replace isCrouching with is holding shift key (fix flying)
+or maybe isSecondaryUseActive or something
 
 Only do the item split thing if more than one in stack
 
