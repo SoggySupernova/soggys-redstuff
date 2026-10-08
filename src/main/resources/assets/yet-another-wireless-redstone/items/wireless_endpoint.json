@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+  }
+}

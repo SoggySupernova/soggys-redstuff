@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+  }
+}

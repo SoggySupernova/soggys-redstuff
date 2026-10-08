@@ -63,7 +63,9 @@ Replace isCrouching with is holding shift key (fix flying)
 
 Only do the item split thing if more than one in stack
 
-Different block texture for transmitter/receiver
+Different block texture for transmitter/receiver ✅
+
+Make better textures
 
 Functionize code more
 

@@ -1,0 +1,100 @@
+{
+  "variants": {
+    "is_receiver=false,power=0": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=1": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=2": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=3": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=4": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=5": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=6": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=7": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=8": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=9": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=10": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=11": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=12": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=13": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=14": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=false,power=15": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_transmitter"
+    },
+    "is_receiver=true,power=0": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint"
+    },
+    "is_receiver=true,power=1": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=2": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=3": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=4": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=5": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=6": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=7": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=8": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=9": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=10": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=11": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=12": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=13": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=14": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    },
+    "is_receiver=true,power=15": {
+      "model": "yet-another-wireless-redstone:block/wireless_endpoint_lit"
+    }
+  }
+}
