@@ -88,6 +88,8 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
 
 
 
+
+
     @Override
     protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!(level.getBlockEntity(pos) instanceof WirelessEndpointBlockEntity counterBlockEntity)) {
@@ -95,16 +97,15 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
         }
 
 
-
+        // is crouching with any item: reset this block.
             if (player.isCrouching()) {
                 // If holding wireless linker, reset it
                 // Actually this doesn't work because sneaking bypass block use
                 // Real logic now in WirelessLinkerItem
 
-                    counterBlockEntity.clearReceivers();
-                    counterBlockEntity.setIsReceiver(false);
+                    counterBlockEntity.resetThisBlock(true);
                     if (level.isClientSide()) {
-                        player.sendOverlayMessage(Component.literal("Cleared all connections"));
+                        player.sendOverlayMessage(Component.literal("Cleared block connections"));
                     }
                     level.playSound(player, pos, SoundEvents.LANTERN_HIT, SoundSource.BLOCKS, 1.0F, 0.8F);
                     return InteractionResult.SUCCESS; // swing arm
@@ -115,8 +116,7 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
 
             }
 
-
-
+        // Not hitting block with a wireless linker, return.
         if (!itemStack.is(ModItems.WIRELESS_LINKER)) {
             return super.useWithoutItem(state, level, pos, player, hitResult);
         }
@@ -127,37 +127,66 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
 
         counterBlockEntity.incrementClicks();
 
-        if (level.isClientSide()) {
-            player.sendOverlayMessage(Component.literal("Set transmitter coordinates to " + pos.toShortString() + ""));
 
-        }
 
 
         CustomData a = itemStack.get(DataComponents.CUSTOM_DATA);
-
+        // If the item already has a stored position
         if (a instanceof CustomData && a.copyTag().contains("dim")) {
             var b = a.copyTag();
             boolean isSameBlock = b.get("x").toString().equals(String.valueOf(pos.getX())) && b.get("y").toString().equals(String.valueOf(pos.getY())) && b.get("z").toString().equals(String.valueOf(pos.getZ())) && b.get("dim").toString().equals("\""+level.dimension().identifier().toString()+"\"");
             YetAnotherWirelessRedstone.LOGGER.info(String.valueOf(b.get("dim").toString()));
             YetAnotherWirelessRedstone.LOGGER.info((level.dimension().identifier().toString()));
+
+            boolean transmitterAlreadyExists = (counterBlockEntity.isReceiver() && counterBlockEntity.getTransmitter() != null); // First condition is theoretically unnecessary but we'll check just in case
+
+
+            if (transmitterAlreadyExists && level.isClientSide() && !YetAnotherWirelessRedstone.ALLOW_MULTIPLE_TRANSMITTERS_TO_ONE_RECEIVER) {
+                player.sendOverlayMessage(Component.literal("There is already a transmitter connected to this block!"));
+                return InteractionResult.SUCCESS;
+            }
+
+
             if (isSameBlock && level.isClientSide()) {
                 player.sendOverlayMessage(Component.literal("Can't link an endpoint to itself!"));
+                return InteractionResult.SUCCESS;
             }
 
             if (!isSameBlock) {
-                counterBlockEntity.setIsReceiver(true);
+                counterBlockEntity.setIsReceiver(true, true);
+
+
 
                 if (!level.isClientSide()) {
-                var transmitterBlock = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(b.get("dim").toString().replaceAll("^\"|\"$", "")))).getBlockEntity(new BlockPos(Integer.parseInt(String.valueOf(b.get("x"))),Integer.parseInt(String.valueOf(b.get("y"))),Integer.parseInt(String.valueOf(b.get("z")))));
-                if (transmitterBlock instanceof WirelessEndpointBlockEntity theblockentity) {
-                    theblockentity.addReceiver(new BlockPosAndDimension(pos.getX(), pos.getY(), pos.getZ(), level.dimension().identifier().toString()));
+                    var transmitterBlock = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(b.get("dim").toString().replaceAll("^\"|\"$", "")))).getBlockEntity(new BlockPos(Integer.parseInt(String.valueOf(b.get("x"))),Integer.parseInt(String.valueOf(b.get("y"))),Integer.parseInt(String.valueOf(b.get("z")))));
+                    if (transmitterBlock instanceof WirelessEndpointBlockEntity theblockentity) {
+
+                        theblockentity.addReceiver(new BlockPosAndDimension(pos.getX(), pos.getY(), pos.getZ(), level.dimension().identifier().toString()));
+
+
+                        counterBlockEntity.setTransmitter(
+                                new BlockPosAndDimension(
+                                        Integer.parseInt(String.valueOf(b.get("x"))),
+                                        Integer.parseInt(String.valueOf(b.get("y"))),
+                                        Integer.parseInt(String.valueOf(b.get("z"))),
+                                        ResourceKey.create(
+                                                Registries.DIMENSION,
+                                                Identifier.parse(b.get("dim").toString().replaceAll("^\"|\"$", ""))
+                                        ).identifier().toString() // yeah this converts a string to a dimension back to a string
+
+                                )
+                        );
+                    }
                 }
-                }
+
+
 
 
                 if (level.isClientSide()) {
                     player.sendOverlayMessage(Component.literal("Successfully linked endpoints!"));
                 }
+
+                return InteractionResult.SUCCESS;
             }
         }
 
@@ -173,6 +202,12 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
             compound.putString("dim", level.dimension().identifier().toString());
             newstack.set(DataComponents.CUSTOM_DATA, CustomData.of(compound));
             player.getInventory().placeItemBackInInventory(newstack, false, null);
+            if (level.isClientSide()) {
+                player.sendOverlayMessage(Component.literal("Set transmitter coordinates to " + pos.toShortString()));
+
+            }
+
+            return InteractionResult.SUCCESS;
         }
 
 
@@ -236,8 +271,11 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
                 for (int i = 0; i < receivers.size(); i++) {
                     var receiverLevel = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(receivers.get(i).getDimension())));
                     var receiverBlockPos = new BlockPos(receivers.get(i).getX(), receivers.get(i).getY(), receivers.get(i).getZ());
-                    var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(POWER, sig);
-                    receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
+                    if (receiverLevel.getBlockEntity(receiverBlockPos) instanceof WirelessEndpointBlockEntity && receiverLevel.getBlockState(receiverBlockPos).getBlock() == ModBlocks.WIRELESS_ENDPOINT) {
+                        var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(POWER, sig);
+                        receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
+                    }
+
                 }
             }
         }

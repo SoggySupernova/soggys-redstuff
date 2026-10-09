@@ -16,10 +16,19 @@ import org.slf4j.LoggerFactory;
 public class YetAnotherWirelessRedstone implements ModInitializer {
 	public static final String MOD_ID = "yet-another-wireless-redstone";
 
-	// This logger is used to write text to the console and the log file.
-	// It is considered best practice to use your mod id as the logger's name.
-	// That way, it's clear which mod wrote info, warnings, and errors.
+
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+
+
+
+	// Changing this to true will disable checks that prevent multiple transmitters being linked to one receiver.
+	// The receiver will output the power from whichever transmitter was updated last, allowing for unique behavior.
+	// However, this can cause desync, half-initialized blocks, and undefined behavior.
+	public static final boolean ALLOW_MULTIPLE_TRANSMITTERS_TO_ONE_RECEIVER = false;
+
+
+	private static final boolean ENABLE_LOGGING = true; // todo: make this do something
 
 	@Override
 	public void onInitialize() {

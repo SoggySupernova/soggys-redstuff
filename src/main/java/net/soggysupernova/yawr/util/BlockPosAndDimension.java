@@ -7,6 +7,7 @@ import net.soggysupernova.yawr.YetAnotherWirelessRedstone;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class BlockPosAndDimension {
@@ -84,5 +85,26 @@ public class BlockPosAndDimension {
     }
 
 
+    @Override
+    public String toString() {
+        return "BlockPosAndDimension{" +
+                "x=" + x +
+                ", y=" + y +
+                ", z=" + z +
+                ", dimension='" + dimension + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BlockPosAndDimension that = (BlockPosAndDimension) o;
+        return x == that.x && y == that.y && z == that.z && Objects.equals(dimension, that.dimension);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, z, dimension);
+    }
 }
 

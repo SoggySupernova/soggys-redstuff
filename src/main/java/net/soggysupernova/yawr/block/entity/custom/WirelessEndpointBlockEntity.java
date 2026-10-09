@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.soggysupernova.yawr.YetAnotherWirelessRedstone;
+import net.soggysupernova.yawr.block.ModBlocks;
 import net.soggysupernova.yawr.block.WirelessEndpointBlock;
 import net.soggysupernova.yawr.util.BlockPosAndDimension;
 import net.soggysupernova.yawr.block.entity.ModBlockEntities;
@@ -54,18 +55,28 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
         level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
     }
 
-    public void clearReceivers() {
+    public void clearReceivers(boolean doZeBlockUpdate) {
         if (!level.isClientSide()) {
             for (int i = 0; i < this.getReceiverCount(); i++) {
                 YetAnotherWirelessRedstone.LOGGER.info("Transmitter block cleared (shift click with torch or block break)! Looping through and resetting receivers...");
                 var receiverLevel = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(receivers.get(i).getDimension())));
                 var receiverBlockPos = new BlockPos(receivers.get(i).getX(), receivers.get(i).getY(), receivers.get(i).getZ());
-                var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(WirelessEndpointBlock.IS_RECEIVER, false).setValue(WirelessEndpointBlock.POWER, 0);
-                receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
-                // todo: clear their stored transmitter locations
+                // Make sure it isn't already deleted (Also somehow fixes transmitters not being removed)
+                if (receiverLevel.getBlockState(receiverBlockPos).getBlock() == ModBlocks.WIRELESS_ENDPOINT) {
+                    var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(WirelessEndpointBlock.IS_RECEIVER, false).setValue(WirelessEndpointBlock.POWER, 0);
+                    receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
+                    var receiverBlockEntity = receiverLevel.getBlockEntity(receiverBlockPos);
+                    // Clear stored transmitter location
+                    if (receiverBlockEntity instanceof WirelessEndpointBlockEntity e) {
+                        e.setTransmitter(null);
+                    }
+                }
+
             }
             this.receivers = new Vector<>();
-            level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+            if (doZeBlockUpdate) {
+                level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+            }
         } // Serverside check fixes a weird thing where creating a link from a receiver back to its transmitter would cause a crash when trying to reset the original transmitter
         // how to recreate it:
         // comment out if statement, place three endpoints, get an uninitialized linker
@@ -74,14 +85,29 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
     }
 
     public void removeReceiver(BlockPosAndDimension recv) {
-        var receiverLevel = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(recv.getDimension())));
-        var receiverBlockPos = new BlockPos(recv.getX(), recv.getY(), recv.getZ());
-        var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(WirelessEndpointBlock.IS_RECEIVER, false).setValue(WirelessEndpointBlock.POWER,0);
-        receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
-        // todo: clear its stored transmitter location
 
-        this.receivers.remove(recv);
-        level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+            var receiverLevel = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(recv.getDimension())));
+            var receiverBlockPos = new BlockPos(recv.getX(), recv.getY(), recv.getZ());
+            // Makes sure the receiver wasn't just mined (this can called by resetThisBlock which can be called from block deletion)
+            if (receiverLevel.getBlockEntity(receiverBlockPos) instanceof WirelessEndpointBlockEntity && receiverLevel.getBlockState(receiverBlockPos).getBlock() == ModBlocks.WIRELESS_ENDPOINT && !level.isClientSide()) {
+                var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(WirelessEndpointBlock.IS_RECEIVER, false).setValue(WirelessEndpointBlock.POWER, 0);
+                receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
+
+                // clear its stored transmitter location
+                // Right now this is only called when the receiver is reset, which means its transmitter location will already be cleared, but perhaps this will not be true in the future
+                var receiverBlockEntity = receiverLevel.getBlockEntity(receiverBlockPos);
+
+                if (receiverBlockEntity instanceof WirelessEndpointBlockEntity e) {
+                    e.setTransmitter(null);
+                }
+
+            }
+
+            YetAnotherWirelessRedstone.LOGGER.info("Removing receiver "+recv.toString());
+            this.receivers.remove(recv);
+            YetAnotherWirelessRedstone.LOGGER.info("Vector with receiver removed: "+this.receivers.toString());
+            level.updateNeighborsAt(worldPosition, this.getBlockState().getBlock());
+
     }
 
 
@@ -91,11 +117,28 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
         return isReceiver;
     }
 
-    public void setIsReceiver(boolean receiver) {
+    public void setIsReceiver(boolean receiver, boolean doZeBlockUpdate) {
         isReceiver = receiver;
-        level.setBlock(this.worldPosition, this.getBlockState().setValue(WirelessEndpointBlock.IS_RECEIVER, receiver), WirelessEndpointBlock.UPDATE_ALL);
-        if (receiver == false) {
-            // todo: clear this's transmitter location
+        if (doZeBlockUpdate) {level.setBlock(this.worldPosition, this.getBlockState().setValue(WirelessEndpointBlock.IS_RECEIVER, receiver), WirelessEndpointBlock.UPDATE_ALL);}
+        if (!receiver) {
+
+            if (this.transmitter != null && !level.isClientSide()) {
+                YetAnotherWirelessRedstone.LOGGER.info("Setting isReceiver to false with transmitter data"+this.transmitter.serialize());
+                var transmitterLevel = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(this.transmitter.getDimension())));
+                var transmitterBlockPos = new BlockPos(this.transmitter.getX(), this.transmitter.getY(), this.transmitter.getZ());
+                var transmitterBlockEntity = transmitterLevel.getBlockEntity(transmitterBlockPos);
+                if (transmitterBlockEntity instanceof WirelessEndpointBlockEntity e) {
+                    YetAnotherWirelessRedstone.LOGGER.info("Found transmitter block entity"+e+transmitterBlockPos);
+                    e.removeReceiver(new BlockPosAndDimension(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ(), level.dimension().identifier().toString()));
+                }
+
+
+                transmitterLevel.updateNeighborsAt(transmitterBlockPos, this.getBlockState().getBlock());
+            }
+
+
+           this.setTransmitter(null);
+
         }
     }
 
@@ -112,13 +155,19 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
     }
 
 
+    public void resetThisBlock(boolean doZeBlockUpdate) {
+        YetAnotherWirelessRedstone.LOGGER.info("Resetting block (mined or shiftclicked!)");
+        this.clearReceivers(doZeBlockUpdate); // reset receivers states
+        this.setIsReceiver(false, doZeBlockUpdate); // Remove my location from my transmitter's list
+    }
+
+
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         if (level instanceof ServerLevel l) {
             l.setChunkForced(pos.getX() >> 4, pos.getZ() >> 4, false);
         }
-        this.clearReceivers(); // reset receivers states
-        setIsReceiver(false); // Remove my location from my transmitter's list
+        resetThisBlock(false); // Reset stuff WITHOUT updating myself
         super.preRemoveSideEffects(pos, state);
     }
 
