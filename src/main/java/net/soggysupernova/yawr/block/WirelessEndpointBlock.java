@@ -41,6 +41,7 @@ import net.soggysupernova.yawr.block.entity.ModBlockEntities;
 import net.soggysupernova.yawr.block.entity.custom.WirelessEndpointBlockEntity;
 import net.soggysupernova.yawr.item.ModItems;
 import net.soggysupernova.yawr.util.BlockPosAndDimension;
+import net.soggysupernova.yawr.util.CustomSignalGetter;
 import org.jspecify.annotations.Nullable;
 
 public class WirelessEndpointBlock extends BaseEntityBlock {
@@ -264,7 +265,7 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
         if (!state.getValue(IS_RECEIVER)) {
             var sig = 0;
             if (level.hasNeighborSignal(pos)) {
-                sig = level.getBestNeighborSignal(pos);
+                sig = CustomSignalGetter.getBestNeighborSignalExcludingBlockType(level, pos, ModBlocks.WIRELESS_ENDPOINT);
             }
             if (level.getBlockEntity(pos) instanceof WirelessEndpointBlockEntity e && !level.isClientSide()) {
                 var receivers = e.getReceivers();

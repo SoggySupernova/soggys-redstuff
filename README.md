@@ -48,7 +48,7 @@ Test edge cases:
 - Block linked to a dimension that is later deleted (e.g. sift downgrade, custom dimension)
 
 
-"Already a transmitter connected to this" adds to list of attempted transmitter anyway?
+"Already a transmitter connected to this" adds to list of attempted transmitter anyway? Unable to replicate, was i just going crazy?
 
 Deduplicate receivers list (for comparator output)
 
@@ -58,6 +58,7 @@ When clearing connections, clear isReceiver of connected receivers✅
 
 Transmitter is deleted (connections are automatically deleted, but connected receivers should reset to uninitialized/transmitter and clear redone power and block state)✅
 
+Why does a receiver make redstone connect to one block above and below itself???
 
 Maybe store transmitter location to 
 1. When receiver reset/deleted, remove from transmitter list✅

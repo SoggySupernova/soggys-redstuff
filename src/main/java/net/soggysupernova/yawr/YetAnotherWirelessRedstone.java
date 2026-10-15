@@ -22,6 +22,9 @@ public class YetAnotherWirelessRedstone implements ModInitializer {
 
 
 
+
+
+
 	// Changing this to true will disable checks that prevent multiple transmitters being linked to one receiver.
 	// The receiver will output the power from whichever transmitter was updated last, allowing for unique behavior.
 	// However, this can cause desync, half-initialized blocks, and undefined behavior.
