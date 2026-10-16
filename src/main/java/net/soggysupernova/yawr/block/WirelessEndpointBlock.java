@@ -218,20 +218,6 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    protected boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-        /*
-        YetAnotherWirelessRedstone.LOGGER.info(String.valueOf(pos.relative(direction.getOpposite())));
-        var ioi = level.getBlockEntity(pos.relative(direction.getOpposite())); // get block position based on redstone dust position
-        if (ioi instanceof WirelessEndpointBlockEntity oio) {
-            return oio.isReceiver();
-        }
-        return false;
-
-         */
-
-        return state.getValue(IS_RECEIVER);
-    }
 
     @Override
     protected boolean isSignalSource(BlockState state) {

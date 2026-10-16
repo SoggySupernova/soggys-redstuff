@@ -58,7 +58,7 @@ When clearing connections, clear isReceiver of connected receivers✅
 
 Transmitter is deleted (connections are automatically deleted, but connected receivers should reset to uninitialized/transmitter and clear redone power and block state)✅
 
-Why does a receiver make redstone connect to one block above and below itself???
+Why does a receiver make redstone connect to it one block above and below itself??? Fixed✅
 
 Maybe store transmitter location to 
 1. When receiver reset/deleted, remove from transmitter list✅
