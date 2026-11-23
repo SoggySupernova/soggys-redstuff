@@ -142,18 +142,20 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
             boolean transmitterAlreadyExists = (counterBlockEntity.isReceiver() && counterBlockEntity.getTransmitter() != null); // First condition is theoretically unnecessary but we'll check just in case
 
 
-            if (transmitterAlreadyExists && level.isClientSide() && !YetAnotherWirelessRedstone.ALLOW_MULTIPLE_TRANSMITTERS_TO_ONE_RECEIVER) {
-                player.sendOverlayMessage(Component.literal("There is already a transmitter connected to this block!"));
+            if (transmitterAlreadyExists && !YetAnotherWirelessRedstone.ALLOW_MULTIPLE_TRANSMITTERS_TO_ONE_RECEIVER) {
+                if (level.isClientSide()) {
+                    player.sendOverlayMessage(Component.literal("There is already a transmitter connected to this block!"));
+                }
                 return InteractionResult.SUCCESS;
             }
 
 
-            if (isSameBlock && level.isClientSide()) {
-                player.sendOverlayMessage(Component.literal("Can't link an endpoint to itself!"));
+            if (isSameBlock) {
+                if (level.isClientSide()) {
+                    player.sendOverlayMessage(Component.literal("Can't link an endpoint to itself!"));
+                }
                 return InteractionResult.SUCCESS;
-            }
-
-            if (!isSameBlock) {
+            } else {
                 counterBlockEntity.setIsReceiver(true, true);
 
 
@@ -161,7 +163,7 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
                 if (!level.isClientSide()) {
                     var transmitterBlock = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(b.get("dim").toString().replaceAll("^\"|\"$", "")))).getBlockEntity(new BlockPos(Integer.parseInt(String.valueOf(b.get("x"))),Integer.parseInt(String.valueOf(b.get("y"))),Integer.parseInt(String.valueOf(b.get("z")))));
                     if (transmitterBlock instanceof WirelessEndpointBlockEntity theblockentity) {
-
+                        YetAnotherWirelessRedstone.LOGGER.info("Adding recevier?");
                         theblockentity.addReceiver(new BlockPosAndDimension(pos.getX(), pos.getY(), pos.getZ(), level.dimension().identifier().toString()));
 
 
@@ -173,7 +175,7 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
                                         ResourceKey.create(
                                                 Registries.DIMENSION,
                                                 Identifier.parse(b.get("dim").toString().replaceAll("^\"|\"$", ""))
-                                        ).identifier().toString() // yeah this converts a string to a dimension back to a string
+                                        ).identifier().toString() // Yes, this converts a string to a dimension back to a string.
 
                                 )
                         );

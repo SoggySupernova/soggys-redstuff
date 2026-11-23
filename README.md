@@ -48,7 +48,7 @@ Test edge cases:
 - Block linked to a dimension that is later deleted (e.g. sift downgrade, custom dimension)
 
 
-"Already a transmitter connected to this" adds to list of attempted transmitter anyway? Unable to replicate, was i just going crazy?
+"Already a transmitter connected to this" adds to list of attempted transmitter anyway ✅
 
 Deduplicate receivers list (for comparator output)
 
