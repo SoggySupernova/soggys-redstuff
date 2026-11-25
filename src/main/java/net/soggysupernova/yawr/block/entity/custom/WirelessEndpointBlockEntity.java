@@ -68,6 +68,7 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
                     var receiverBlockEntity = receiverLevel.getBlockEntity(receiverBlockPos);
                     // Clear stored transmitter location
                     if (receiverBlockEntity instanceof WirelessEndpointBlockEntity e) {
+                        e.isReceiver = false;  // Do not call setIsReceiver because that changes the transmitter which is ourselves, leading to infinite loop and crash
                         e.setTransmitter(null);
                     }
                 }
@@ -98,6 +99,7 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
                 var receiverBlockEntity = receiverLevel.getBlockEntity(receiverBlockPos);
 
                 if (receiverBlockEntity instanceof WirelessEndpointBlockEntity e) {
+                    e.isReceiver = false; // Do not call setIsReceiver because that changes the transmitter which is ourselves, leading to infinite loop and crash
                     e.setTransmitter(null);
                 }
 
@@ -118,6 +120,7 @@ public class WirelessEndpointBlockEntity extends BlockEntity {
     }
 
     public void setIsReceiver(boolean receiver, boolean doZeBlockUpdate) {
+        YetAnotherWirelessRedstone.LOGGER.info("Setting isReceiver to "+receiver);
         isReceiver = receiver;
         if (doZeBlockUpdate) {level.setBlock(this.worldPosition, this.getBlockState().setValue(WirelessEndpointBlock.IS_RECEIVER, receiver), WirelessEndpointBlock.UPDATE_ALL);}
         if (!receiver) {

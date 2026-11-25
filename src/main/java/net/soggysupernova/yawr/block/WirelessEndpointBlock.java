@@ -193,8 +193,12 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
             }
         }
 
+        if (counterBlockEntity.isReceiver()) {
+            if (level.isClientSide()) {
+                player.sendOverlayMessage(Component.literal("There is already a transmitter connected to this block!"));
+            }
 
-        if (!counterBlockEntity.isReceiver()) {
+        } else {
             var newstack = itemStack.split(1);
             newstack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true);
             newstack.set(DataComponents.LORE, ItemLore.EMPTY.withLineAdded(Component.literal("("+pos.getX()+", "+pos.getY()+", "+pos.getZ()+"), "+level.dimension().identifier().toString())));
@@ -260,11 +264,10 @@ public class WirelessEndpointBlock extends BaseEntityBlock {
                 for (int i = 0; i < receivers.size(); i++) {
                     var receiverLevel = level.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, Identifier.parse(receivers.get(i).getDimension())));
                     var receiverBlockPos = new BlockPos(receivers.get(i).getX(), receivers.get(i).getY(), receivers.get(i).getZ());
-                    if (receiverLevel.getBlockEntity(receiverBlockPos) instanceof WirelessEndpointBlockEntity && receiverLevel.getBlockState(receiverBlockPos).getBlock() == ModBlocks.WIRELESS_ENDPOINT) {
+                    if (receiverLevel.getBlockEntity(receiverBlockPos) instanceof WirelessEndpointBlockEntity ee && receiverLevel.getBlockState(receiverBlockPos).getBlock() == ModBlocks.WIRELESS_ENDPOINT && receiverLevel.getBlockState(receiverBlockPos).getValue(IS_RECEIVER)) {
                         var receiverBlockState = receiverLevel.getBlockState(receiverBlockPos).setValue(POWER, sig);
                         receiverLevel.setBlock(receiverBlockPos, receiverBlockState, WirelessEndpointBlock.UPDATE_ALL);
                     }
-
                 }
             }
         }

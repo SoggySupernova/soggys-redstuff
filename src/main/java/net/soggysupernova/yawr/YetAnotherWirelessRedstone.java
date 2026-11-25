@@ -19,6 +19,10 @@ public class YetAnotherWirelessRedstone implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+	// conditionally send LOGGER to ACTUAL_LOGGER if ENABLE_LOGGING is true:
+
+
+
 
 
 

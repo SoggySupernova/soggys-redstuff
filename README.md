@@ -36,7 +36,7 @@ Swap transmitter and receiver?
 
 Test edge cases:
 - Transmitter and receiver same block ✅
-- Receiver is deleted (Transmitter should check block before sending✅ (ANd check if it's a receiver! (And, if I implement it, that its stored transmitter location matches us))
+- Receiver is deleted (Transmitter should check block before sending✅ (ANd check if it's a receiver!✅ (And, if I implement it, that its stored transmitter location matches us))
 - Receiver is reset and a different transmitter connects to it (It should clear its first receiver on reset) ✅
 - Item is linked to a transmitter which is then deleted before linked to a receiver (Check if transmitter block is still there and still a transmitter)
 - Item linked to transmitter, transmitter deleted and replaced with a reciever before linked to a receiver (check that isReceiver is false i guess)
@@ -68,6 +68,8 @@ Replace isCrouching with is holding shift key (fix flying)
 or maybe isSecondaryUseActive or something
 
 Only do the item split thing if more than one in stack
+
+removeReceiver and clearReceivers would only change blockstate of receivers to transmitter and not block entity data Fixed✅
 
 Different block texture for transmitter/receiver ✅
 
